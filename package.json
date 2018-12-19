@@ -1,0 +1,32 @@
+{
+  "name": "gulp-nim",
+  "version": "0.1.0",
+  "description": "Gulp plugin to compile Nim files.",
+  "main": "main.js",
+  "scripts": {
+    "test": "npx gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Double-oxygeN/gulp-nim.git"
+  },
+  "keywords": [
+    "gulp",
+    "gulpplugin",
+    "nim"
+  ],
+  "author": "Double-oxygeN",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Double-oxygeN/gulp-nim/issues"
+  },
+  "homepage": "https://github.com/Double-oxygeN/gulp-nim#readme",
+  "devDependencies": {
+    "gulp": "^4.0.0",
+    "livescript": "^1.6.0",
+    "plugin-error": "^1.0.1",
+    "replace-ext": "^1.0.0",
+    "tempy": "^0.2.1",
+    "through2": "^3.0.0"
+  }
+}
