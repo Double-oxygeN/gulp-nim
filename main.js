@@ -15,7 +15,7 @@
  */
 const through = require('through2')
 const PluginError = require('plugin-error')
-const replaceExtension = require('replace-ext')
+const log = require('fancy-log')
 const { readFile } = require('fs')
 const { exec } = require('child_process')
 const tempy = require('tempy')
@@ -25,9 +25,9 @@ const ALNUM_ONLY = /^[A-Za-z0-9]+$/
 
 module.exports = (opts = {}) => {
   const optsStr = Object.entries(opts)
-    .filter(([key, val]) => ALNUM_ONLY.test(key) && ALNUM_ONLY.test(val))
-    .map(([key, val]) => [key, (typeof val !== 'boolean') ? val : val ? 'on' : 'off'])
-    .map(([key, val]) => /^.$/.test(key) ? `-${key}:${val}` : `--${key}:${val}`)
+    .filter(([key, val]) => ALNUM_ONLY.test(key))
+    .map(([key, val]) => [key, (typeof val !== 'boolean') ? val.replace('\\', '\\\\').replace(/'/, "\\'") : val ? 'on' : 'off'])
+    .map(([key, val]) => (/^.$/.test(key) ? "'-" : "'--") + key + (val.length === 0 ? "'" : `:${val}'`))
     .join(' ')
   const transform = (file, enc, cb) => {
     if (file.isNull()) {
@@ -41,8 +41,11 @@ module.exports = (opts = {}) => {
     if (file.isBuffer()) {
       const tempOut = tempy.file({ extension: 'js' })
 
+      log(`Executing: nim js ${optsStr} ${file.path}`)
       exec(`nim js -o:${tempOut} ${optsStr} ${file.path}`, (errExec, stdout, stderr) => {
-        console.log(stderr)
+        (stderr + stdout).split(/\r?\n/).forEach(line => {
+          log(line)
+        })
 
         if (errExec !== null) {
           return cb(new PluginError(PLUGIN_NAME, errExec.message))
@@ -54,7 +57,7 @@ module.exports = (opts = {}) => {
           }
 
           file.contents = data
-          file.path = replaceExtension(file.path, '.js')
+          file.extname = '.js'
 
           cb(null, file)
         })
