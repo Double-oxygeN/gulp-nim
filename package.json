@@ -23,7 +23,9 @@
   "homepage": "https://github.com/Double-oxygeN/gulp-nim#readme",
   "devDependencies": {
     "gulp": "^4.0.0",
-    "livescript": "^1.6.0",
+    "livescript": "^1.6.0"
+  },
+  "dependencies": {
     "plugin-error": "^1.0.1",
     "replace-ext": "^1.0.0",
     "tempy": "^0.2.1",

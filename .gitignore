@@ -1,4 +1,5 @@
 src/
 dest/
 node_modules/
+gulpfile.ls
 
