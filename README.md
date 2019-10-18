@@ -1,5 +1,7 @@
 # gulp-nim
 
+[![npm version](https://badge.fury.io/js/gulp-nim.svg)](https://badge.fury.io/js/gulp-nim)
+
 Gulp plugin to compile [Nim](https://nim-lang.org/) files.
 
 ## Installation
