@@ -50,4 +50,3 @@ For more details, see [Nim Compiler User Guide](https://nim-lang.org/docs/nimc.h
 ## License
 
 Apache-2.0
-
