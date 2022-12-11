@@ -25,7 +25,7 @@ const ALNUM_ONLY = /^[A-Za-z0-9]+$/
 
 module.exports = (opts = {}) => {
   const optsStr = Object.entries(opts)
-    .filter(([key, val]) => ALNUM_ONLY.test(key))
+    .filter(([key, _val]) => ALNUM_ONLY.test(key))
     .map(([key, val]) => [key, (typeof val !== 'boolean') ? val.replace('\\', '\\\\').replace(/'/, "\\'") : val ? 'on' : 'off'])
     .map(([key, val]) => (/^.$/.test(key) ? "'-" : "'--") + key + (val.length === 0 ? "'" : `:${val}'`))
     .join(' ')
@@ -35,7 +35,7 @@ module.exports = (opts = {}) => {
     readableObjectMode: true,
     writableObjectMode: true,
 
-    transform (file, enc, cb) {
+    transform (file, _enc, cb) {
       if (file.isNull()) {
         return cb(null, file)
       }
