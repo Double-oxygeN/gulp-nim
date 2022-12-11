@@ -23,20 +23,6 @@ exports.default = function() {
 }
 ```
 
-`gulpfile.ls`(LiveScript)
-
-```ls
-require! {
-  gulp: { src, dest }
-  \gulp-nim
-}
-
-export default: ->
-  src "./src/nim/app.nim"
-    .pipe gulp-nim { d: \release, opt: \size, colors: on, skip-cfg: '' }
-    .pipe dest "./script"
-```
-
 ## API
 
 ### nim([opts])
