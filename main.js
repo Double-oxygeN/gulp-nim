@@ -13,11 +13,11 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-const through = require('through2')
 const PluginError = require('plugin-error')
 const log = require('fancy-log')
-const { readFile } = require('fs')
-const { exec } = require('child_process')
+const { Transform } = require('node:stream')
+const { readFile } = require('node:fs')
+const { exec } = require('node:child_process')
 const tempy = require('tempy')
 
 const PLUGIN_NAME = 'gulp-nim'
@@ -29,41 +29,46 @@ module.exports = (opts = {}) => {
     .map(([key, val]) => [key, (typeof val !== 'boolean') ? val.replace('\\', '\\\\').replace(/'/, "\\'") : val ? 'on' : 'off'])
     .map(([key, val]) => (/^.$/.test(key) ? "'-" : "'--") + key + (val.length === 0 ? "'" : `:${val}'`))
     .join(' ')
-  const transform = (file, enc, cb) => {
-    if (file.isNull()) {
-      return cb(null, file)
-    }
 
-    if (file.isStream()) {
-      return cb(new PluginError(PLUGIN_NAME, "Streaming not supported"))
-    }
+  return new Transform({
+    // Must turn object mode on in order to transform a Vinyl object.
+    readableObjectMode: true,
+    writableObjectMode: true,
 
-    if (file.isBuffer()) {
-      const tempOut = tempy.file({ extension: 'js' })
+    transform (file, enc, cb) {
+      if (file.isNull()) {
+        return cb(null, file)
+      }
 
-      log(`Executing: nim js ${optsStr} ${file.path}`)
-      exec(`nim js -o:${tempOut} ${optsStr} ${file.path}`, (errExec, stdout, stderr) => {
-        (stderr + stdout).split(/\r?\n/).forEach(line => {
-          log(line)
-        })
+      if (file.isStream()) {
+        return cb(new PluginError(PLUGIN_NAME, "Streaming not supported"))
+      }
 
-        if (errExec !== null) {
-          return cb(new PluginError(PLUGIN_NAME, errExec.message))
-        }
+      if (file.isBuffer()) {
+        const tempOut = tempy.file({ extension: 'js' })
 
-        readFile(tempOut, (errReadFile, data) => {
-          if (errReadFile !== null) {
-            return cb(new PluginError(PLUGIN_NAME, errReadFile.message))
+        log(`Executing: nim js ${optsStr} ${file.path}`)
+        exec(`nim js -o:${tempOut} ${optsStr} ${file.path}`, (errExec, stdout, stderr) => {
+          (stderr + stdout).split(/\r?\n/).forEach(line => {
+            log(line)
+          })
+
+          if (errExec !== null) {
+            return cb(new PluginError(PLUGIN_NAME, errExec.message))
           }
 
-          file.contents = data
-          file.extname = '.js'
+          readFile(tempOut, (errReadFile, data) => {
+            if (errReadFile !== null) {
+              return cb(new PluginError(PLUGIN_NAME, errReadFile.message))
+            }
 
-          cb(null, file)
+            file.contents = data
+            file.extname = '.js'
+
+            cb(null, file)
+          })
         })
-      })
+      }
     }
-  }
-
-  return through.obj(transform)
+  })
 }
