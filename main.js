@@ -44,31 +44,34 @@ module.exports = (opts = {}) => {
         return cb(new PluginError(PLUGIN_NAME, "Streaming not supported"))
       }
 
-      if (file.isBuffer()) {
-        const tempOut = tempy.file({ extension: 'js' })
+      if (!file.isBuffer()) {
+        log(`[${PLUGIN_NAME}] Received non-Buffer object. Pass.`)
+        return cb(null, file)
+      }
 
-        log(`Executing: nim js ${optsStr} ${file.path}`)
-        exec(`nim js -o:${tempOut} ${optsStr} ${file.path}`, (errExec, stdout, stderr) => {
-          (stderr + stdout).split(/\r?\n/).forEach(line => {
-            log(line)
-          })
+      const tempOut = tempy.file({ extension: 'js' })
 
-          if (errExec !== null) {
-            return cb(new PluginError(PLUGIN_NAME, errExec.message))
+      log(`Executing: nim js ${optsStr} ${file.path}`)
+      exec(`nim js -o:${tempOut} ${optsStr} ${file.path}`, (errExec, stdout, stderr) => {
+        (stderr + stdout).split(/\r?\n/).forEach(line => {
+          log(line)
+        })
+
+        if (errExec !== null) {
+          return cb(new PluginError(PLUGIN_NAME, errExec.message))
+        }
+
+        readFile(tempOut, (errReadFile, data) => {
+          if (errReadFile !== null) {
+            return cb(new PluginError(PLUGIN_NAME, errReadFile.message))
           }
 
-          readFile(tempOut, (errReadFile, data) => {
-            if (errReadFile !== null) {
-              return cb(new PluginError(PLUGIN_NAME, errReadFile.message))
-            }
+          file.contents = data
+          file.extname = '.js'
 
-            file.contents = data
-            file.extname = '.js'
-
-            cb(null, file)
-          })
+          cb(null, file)
         })
-      }
+      })
     }
   })
 }
