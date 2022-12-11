@@ -33,11 +33,11 @@ module.exports = (opts = {}) => {
     if (file.isNull()) {
       return cb(null, file)
     }
-    
+
     if (file.isStream()) {
       return cb(new PluginError(PLUGIN_NAME, "Streaming not supported"))
     }
-    
+
     if (file.isBuffer()) {
       const tempOut = tempy.file({ extension: 'js' })
 
@@ -67,4 +67,3 @@ module.exports = (opts = {}) => {
 
   return through.obj(transform)
 }
-
