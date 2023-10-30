@@ -35,6 +35,11 @@ Each of key-value pairs corresponds to one compiler option.
 
 For more details, see [Nim Compiler User Guide](https://nim-lang.org/docs/nimc.html).
 
+#### Multiple value support
+
+Values of `opts` allow multiple values.
+For example, `{d: ['release', 'nodejs']}` means `-d:release -d:nodejs`.
+
 ## License
 
 Apache-2.0
