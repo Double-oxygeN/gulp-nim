@@ -23,10 +23,17 @@ const tempy = require('tempy')
 const PLUGIN_NAME = 'gulp-nim'
 const ALNUM_ONLY = /^[A-Za-z0-9]+$/
 
+const convertValues = (val) =>
+  (typeof val === 'boolean') ? [(val ? 'on' : 'off')] :
+  (typeof val === 'string') ? [val.replace('\\', '\\\\').replace(/'/, "\\'")] :
+  (typeof val === 'object') ? Object.values(val).map(convertValues).flat() :
+  [`${val}`]
+
 module.exports = (opts = {}) => {
   const optsStr = Object.entries(opts)
     .filter(([key, _val]) => ALNUM_ONLY.test(key))
-    .map(([key, val]) => [key, (typeof val !== 'boolean') ? val.replace('\\', '\\\\').replace(/'/, "\\'") : val ? 'on' : 'off'])
+    .map(([key, val]) => [key, convertValues(val)])
+    .flatMap(([key, val]) => val.map(v => [key, v]))
     .map(([key, val]) => (/^.$/.test(key) ? "'-" : "'--") + key + (val.length === 0 ? "'" : `:${val}'`))
     .join(' ')
 
