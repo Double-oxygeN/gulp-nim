@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/Double-oxygeN/gulp-nim#readme",
   "devDependencies": {
-    "gulp": "^4.0.0"
+    "gulp": "^5.0.0"
   },
   "dependencies": {
     "fancy-log": "^1.3.3",
